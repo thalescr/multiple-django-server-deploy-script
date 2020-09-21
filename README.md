@@ -10,7 +10,7 @@ It is based on this tutorial: https://github.com/viniciosbarretos/Multiple-Djang
 - Nginx
 - Python >= 3.7
 - python-venv
-- Pip >= 20.0
+- Pip >= 19.0
 
 ## Usage
 
