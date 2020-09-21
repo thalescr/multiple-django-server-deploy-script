@@ -14,7 +14,7 @@ It is based on this tutorial: https://github.com/viniciosbarretos/Multiple-Djang
 
 ## Usage
 
-Clone this repository inside your Django project folder. The project folder has to be inside your user folder (e.g. `/home/my-linux-user/`).
+Copy the `deploy.sh` script inside your Django project folder. The project folder has to be inside your user folder (e.g. `/home/my-linux-user/`).
 
 Ensure you have all requirements installed and updated in your system and run the following command:
 
