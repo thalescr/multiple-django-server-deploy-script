@@ -2,6 +2,8 @@
 
 A script that automates deploying a Django website using Gunicorn and nginx in a shared environment.
 
+It is based on this tutorial: https://github.com/viniciosbarretos/Multiple-Django-Single-Server
+
 ## Requirements
 
 - A linux environment with root privileges
