@@ -41,28 +41,44 @@ sock_path="$current_dir/$site_name.sock"
 venv_path="$current_dir/venv"
 
 # Check python version
-python_version=$(python3 --version 2>&1 | grep -Po '(?<=Python )(.+)')
+python_version=$(python3.8 --version 2>&1 | grep -Po '(?<=Python )(.+)')
 if [[ "$python_version" < "3.7.0" ]]; then
-    echo "Missing python version at least 3.7 Check the command 'python3 --version'"
-    exit
+    python_version=$(python3.7 --version 2>&1 | grep -Po '(?<=Python )(.+)')
+    if [[ "$python_version" < "3.7.0" ]]; then
+        echo "Missing python version at least 3.7 Check the command 'python3 --version'"
+        exit
+    else
+        python="python3.7"
+    fi
+else
+    python="python3.8"
 fi
 
 # Check pip version
-pip_version=$(pip3 --version 2>&1 | grep -Po '(?<=pip )(.+)' | cut -f1 -d" ")
+pip_version=$(pip3 --version 2>&1 | tail -1 | grep -Po '(?<=pip )(.+)' | cut -f1 -d" ")
 if [[ "$pip_version" < "19.0.0" ]]; then
     echo "Missing pip version at least 19.0.0 Check the command 'pip3 --version'"
     exit
+else
+    pip="pip3"
 fi
 
+# Enter user mode
+sudo -i -u $user_name /bin/sh << EOF
+
 # Create virtual environment and install requirements
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-pip3 install gunicorn
+$python -m venv $venv_path
+source $venv_path/bin/activate
+$pip install -r $current_dir/requirements.txt
+$pip install gunicorn
 
 # Collect static data and migrate the database (just in case)
-python3 manage.py collectstatic
-python3 manage.py migrate
+$python $current_dir/manage.py collectstatic
+yes
+$python $current_dir/manage.py migrate
+
+# Exit user mode
+EOF
 
 # Generate gunicorn socket file
 cat > /etc/systemd/system/$site_name.gunicorn.socket <<EOF
@@ -85,7 +101,7 @@ After=network.target
 [Service]
 User=$user_name
 Group=www-data
-WorkingDirectory=$current_path
+WorkingDirectory=$current_dir
 ExecStart=$venv_path/bin/gunicorn --access-logfile - --workers 3 --bind unix:$sock_path $wsgi.wsgi:application
 
 [Install]
@@ -93,6 +109,7 @@ WantedBy=multi-user.target
 EOF
 
 # Start and enable gunicorn socket and service
+systemctl daemon-reload
 systemctl start $site_name.gunicorn.socket
 systemctl enable $site_name.gunicorn.socket
 systemctl start $site_name.gunicorn.service

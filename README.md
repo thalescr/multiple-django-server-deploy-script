@@ -16,7 +16,7 @@ It is based on this tutorial: https://github.com/viniciosbarretos/Multiple-Djang
 
 Copy the `deploy.sh` script inside your Django project folder. The project folder has to be inside your user folder (e.g. `/home/my-linux-user/`).
 
-Ensure you have all requirements installed and updated in your system and run the following command:
+Ensure you have all requirements installed and updated in your system and you deleted any previous virtual environment. Then run the following command:
 
 ```
 ./deploy.sh [SITE NAME] [DOMAIN] [USER]
